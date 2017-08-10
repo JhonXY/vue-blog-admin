@@ -16,7 +16,7 @@ export default new Router({
       component: index,
       children: [
             { path: '/article', component: article, name: '文章新建'},
-            { path: '/tags', component: tags, name: '标签列表'},
+            { path: '/change', component: change, name: '文章修改'},
             { path: '/articleList', component: articleList, name: '文章列表'},
         ]
     }

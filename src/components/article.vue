@@ -17,7 +17,7 @@
       <el-button v-popover:popover5 class="submit">发布</el-button>
       <div class="left">
       <el-button @click="dialogTableVisible = true">填写信息</el-button>
-      <el-button>上传图片</el-button>
+      <el-button>添加分类</el-button>
       </div>
     </div>
   </div>
@@ -52,15 +52,33 @@ export default{
         value: '# 请开始你的表演',
         tags:[{
           name: "js",
-          id: "001"
         },
         {
-          name: "电影",
-          id: "002"
+          name: "CSS",
+        },
+        {
+          name: "Html",
+        },
+        {
+          name: "Vue",
+        },
+        {
+          name: "React",
         },
         {
           name: "python",
-          id: "003"
+        },
+        {
+          name: "ACG",
+        },
+        {
+          name: "杂谈",
+        },
+        {
+          name: "事件记录",
+        },
+        {
+          name: "电影",
         }],
         content: '',
         visible2: false,
@@ -72,8 +90,6 @@ export default{
         },
         formLabelWidth: '120px'
       }
-		},
-		computed: {
 		},
 		methods: {
       getContent (value,render) {
@@ -97,6 +113,7 @@ export default{
                 type: 'success',
                 message: '文章已发布'
               })
+              this.visible2 = false
             } else {
               this.$message.error('未发布')
             }

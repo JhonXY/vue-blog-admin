@@ -18,15 +18,11 @@
       <el-breadcrumb-item>xxx</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
-  <el-row type="flex"  class="row">
+  <el-row  type="flex">
       <el-menu :default-active="$router.path" :router="true" mode="vertical" :collapse="isCollapse">
         <el-menu-item index="/articleList">
           <i class="el-icon-menu"></i>
           <span slot="title">文章列表</span>
-        </el-menu-item>
-        <el-menu-item index="/tags">
-          <i class="el-icon-menu"></i>
-          <span slot="title">文章修改</span>
         </el-menu-item>
         <el-menu-item index="/article">
           <i class="el-icon-setting"></i>
