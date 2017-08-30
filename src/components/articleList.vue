@@ -73,7 +73,7 @@ export default {
         page: this.page,
         pageSize: this.pageSize,
       }
-      axios.get("/admin/articleList",{
+      axios.get("/api/articleList",{
         params: param //传入到后端的参数集
       }).then((result)=>{
         let res = result.data

@@ -4,7 +4,7 @@
     <mavon-editor class="set" v-model="value" @change="getContent"></mavon-editor>
     <div class="footer">
       <el-popover
-        ref="popover5"
+        ref="submit"
         placement="top"
         width="160"
         v-model="visible2">
@@ -14,14 +14,14 @@
           <el-button type="primary" size="mini" @click="subArticle">确定</el-button>
         </div>
       </el-popover>
-      <el-button v-popover:popover5 class="submit">发布</el-button>
+      <el-button v-popover:submit class="submit">发布</el-button>
       <div class="left">
-      <el-button @click="dialogTableVisible = true">填写信息</el-button>
-      <el-button>添加分类</el-button>
+      <el-button @click="dialogTableVisible1 = true">填写信息</el-button>
+      <el-button @click="dialogTableVisible2 = true">添加分类</el-button>
       </div>
     </div>
   </div>
-  <el-dialog title="文章信息" :visible.sync="dialogTableVisible">
+  <el-dialog title="文章信息" :visible.sync="dialogTableVisible1">
     <el-form :model="form">
       <el-form-item label="文章标题" :label-width="formLabelWidth">
         <el-input v-model="form.title" placeholder="请输入标题"></el-input>
@@ -37,8 +37,33 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogTableVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
+      <el-button @click="dialogTableVisible1 = false">取 消</el-button>
+      <el-button type="primary" @click="dialogTableVisible1 = false">确 定</el-button>
+    </div>
+  </el-dialog>
+  <el-dialog title="标签分类" :visible.sync="dialogTableVisible2" id="tags">
+    <el-tag
+      :key="tag.name"
+      v-for="tag in tags"
+      :closable="true"
+      :close-transition="false"
+      @close="handleClose(tag.name)"
+    >
+    {{tag.name}}
+    </el-tag>
+    <el-input
+      class="input-new-tag"
+      v-if="inputVisible"
+      v-model="inputValue"
+      ref="saveTagInput"
+      size="mini"
+      @keyup.enter.native="handleInputConfirm"
+      @blur="handleInputConfirm"
+    >
+    </el-input>
+    <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" @click="dialogTableVisible2 = false">确 定</el-button>
     </div>
   </el-dialog>
 </div>
@@ -50,39 +75,13 @@ export default{
 		data(){
       return {
         value: '# 请开始你的表演',
-        tags:[{
-          name: "js",
-        },
-        {
-          name: "CSS",
-        },
-        {
-          name: "Html",
-        },
-        {
-          name: "Vue",
-        },
-        {
-          name: "React",
-        },
-        {
-          name: "python",
-        },
-        {
-          name: "ACG",
-        },
-        {
-          name: "杂谈",
-        },
-        {
-          name: "事件记录",
-        },
-        {
-          name: "电影",
-        }],
+        tags:[],
         content: '',
         visible2: false,
-        dialogTableVisible: false,
+        dialogTableVisible1: false,
+        dialogTableVisible2: false,
+        inputValue: '',
+        inputVisible: false,
         form: {
           title: '',
           tag: '',
@@ -91,6 +90,9 @@ export default{
         formLabelWidth: '120px'
       }
 		},
+    mounted () {
+      this.getTags()
+    },
 		methods: {
       getContent (value,render) {
         this.content = render
@@ -101,7 +103,7 @@ export default{
         } else if (!this.content) {
           this.$message.error('无内容')
         } else {
-          axios.post("/admin/articleSub", {
+          axios.post("/api/articleSub", {
             title: this.form.title,
             tag: this.form.tag,
             describtion: this.form.describtion,
@@ -120,12 +122,80 @@ export default{
           })
         }
       },
+      getTags () {
+        axios.get("/api/tags").then((result)=>{
+          let res = result.data
+          if (res.status == "0"){
+            this.tags = res.result.list;
+          } else {
+            this.tags = [];
+          }
+        })
+      },
+      handleClose(tag) {
+        this.tags.splice(this.tags.indexOf(tag.name), 1);
+        axios.post("/api/tagsDelete", {
+          tagDel: tag
+        }).then((response)=>{
+          let res = response.data
+          if (res.status == '0') {
+            this.$message({
+              type: 'success',
+              message: '标签已删除'
+            })
+          } else {
+            this.$message.error('未删除')
+          }
+        })
+      },
+      showInput() {
+        this.inputVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus();
+        });
+      },
+      handleInputConfirm() {
+        let inputValue = this.inputValue;
+        if (inputValue) {
+          this.tags.push({name:inputValue});
+          axios.post("/api/tagsAdd", {
+            tagAdd: inputValue
+          }).then((response)=>{
+            let res = response.data
+            if (res.status == '0') {
+              this.$message({
+                type: 'success',
+                message: '标签已添加'
+              })
+            } else {
+              this.$message.error('未添加')
+            }
+          })
+        }
+        this.inputVisible = false;
+        this.inputValue = '';
+      }
 		}
 	}
 </script>
 
 <style lang="css">
-.footer{
+#tags .el-tag+.el-tag {
+  margin-left: 10px;
+}
+#tags .button-new-tag,.input-new-tag{
+  margin-left: 10px;
+  height: 24px;
+  line-height: 22px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#tags .input-new-tag {
+  width:78px;
+  margin-left:10px;
+  vertical-align:bottom
+}
+.footer {
   overflow: hidden;
   margin: 0 auto;
   padding-top: 20px;

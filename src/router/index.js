@@ -14,6 +14,7 @@ export default new Router({
       path: '/',
       name: 'index',
       component: index,
+      redirect: '/articleList',
       children: [
             { path: '/article', component: article, name: '文章新建'},
             { path: '/change', component: change, name: '文章修改'},
