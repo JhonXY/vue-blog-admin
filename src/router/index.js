@@ -5,11 +5,16 @@ import article from '@/components/article'
 import tags from '@/components/tags'
 import change from '@/components/change'
 import articleList from '@/components/articleList'
+import login from '@/components/login'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
+    {
+      path: '/login',
+      component: login
+    },
     {
       path: '/',
       name: 'index',
